@@ -4,19 +4,24 @@ import (
 	"fmt"
 	"net/http"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/mneil/polsino/server/middleware"
+	"github.com/mneil/polsino/server/request"
+	"github.com/sirupsen/logrus"
 )
 
-func viewHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "<h1>wat</h1><div>ok</div>")
-}
-
 func handler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+
+	}
 	fmt.Fprintf(w, "Hi there, I love %s!", r.URL.Path[1:])
 }
 
 func main() {
-	log.Info("Starting Polsino Server")
-	http.HandleFunc("/", handler)
-	log.Fatal(http.ListenAndServe(":9000", nil))
+	logrus.Info("Starting Polsino Server")
+	auth := middleware.Auth{}
+	common := []request.Handler{
+		auth.Verify,
+	}
+	http.HandleFunc("/", request.Handlers(common))
+	logrus.Fatal(http.ListenAndServe(":9000", nil))
 }
